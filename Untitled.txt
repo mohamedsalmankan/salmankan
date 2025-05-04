@@ -1,3 +1,44 @@
-a=10
-b=19
-print(a+b)
+import heapq
+
+class Graph:
+    def __init__(self):
+        self.vertices = {}
+
+    def add_edge(self, src, dest, weight):
+        if src not in self.vertices:
+            self.vertices[src] = []
+        self.vertices[src].append((dest, weight))
+
+    def dijkstra(self, start):
+        distances = {vertex: float('inf') for vertex in self.vertices}
+        distances[start] = 0
+        queue = [(0, start)]
+
+        while queue:
+            current_distance, current_vertex = heapq.heappop(queue)
+            if current_distance > distances[current_vertex]:
+                continue
+            for neighbor, weight in self.vertices[current_vertex]:
+                distance = current_distance + weight
+                if distance < distances[neighbor]:
+                    distances[neighbor] = distance
+                    heapq.heappush(queue, (distance, neighbor))
+
+        return distances
+
+route_map = Graph()
+route_map.add_edge('A', 'B', 4)
+route_map.add_edge('A', 'C', 2)
+route_map.add_edge('B', 'C', 5)
+route_map.add_edge('B', 'D', 10)
+route_map.add_edge('C', 'D', 3)
+route_map.add_edge('D', 'E', 7)
+route_map.add_edge('E', 'F', 2)
+route_map.add_edge('F', 'D', 2)
+
+source = 'A'
+shortest_distances = route_map.dijkstra(source)
+
+print("Shortest distances from", source, "to all other cities:")
+for city, distance in shortest_distances.items():
+    print("To", city, ":", distance)
